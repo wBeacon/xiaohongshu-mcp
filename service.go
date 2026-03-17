@@ -565,6 +565,38 @@ func withBrowserPage(fn func(*rod.Page) error) error {
 	return fn(page)
 }
 
+// FollowUser 关注用户
+func (s *XiaohongshuService) FollowUser(ctx context.Context, userID, xsecToken string) (*FollowUserResult, error) {
+	b := newBrowser()
+	defer b.Close()
+
+	page := b.NewPage()
+	defer page.Close()
+
+	action := xiaohongshu.NewFollowAction(page)
+	result, err := action.Follow(ctx, userID, xsecToken)
+	if err != nil {
+		return nil, err
+	}
+	return &FollowUserResult{UserID: result.UserID, Success: result.Success, Message: result.Message}, nil
+}
+
+// UnfollowUser 取消关注用户
+func (s *XiaohongshuService) UnfollowUser(ctx context.Context, userID, xsecToken string) (*FollowUserResult, error) {
+	b := newBrowser()
+	defer b.Close()
+
+	page := b.NewPage()
+	defer page.Close()
+
+	action := xiaohongshu.NewFollowAction(page)
+	result, err := action.Unfollow(ctx, userID, xsecToken)
+	if err != nil {
+		return nil, err
+	}
+	return &FollowUserResult{UserID: result.UserID, Success: result.Success, Message: result.Message}, nil
+}
+
 // GetMyProfile 获取当前登录用户的个人信息
 func (s *XiaohongshuService) GetMyProfile(ctx context.Context) (*UserProfileResponse, error) {
 	var result *xiaohongshu.UserProfileResponse

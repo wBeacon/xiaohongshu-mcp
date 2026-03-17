@@ -103,6 +103,20 @@ type UserProfileRequest struct {
 	XsecToken string `json:"xsec_token" binding:"required"`
 }
 
+// FollowUserRequest 关注/取消关注用户请求
+type FollowUserRequest struct {
+	UserID    string `json:"user_id" binding:"required"`
+	XsecToken string `json:"xsec_token" binding:"required"`
+	Unfollow  bool   `json:"unfollow,omitempty"`
+}
+
+// FollowUserResult 关注/取消关注用户响应
+type FollowUserResult struct {
+	UserID  string `json:"user_id"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 // ActionResult 通用动作响应（点赞/收藏等）
 type ActionResult struct {
 	FeedID  string `json:"feed_id"`

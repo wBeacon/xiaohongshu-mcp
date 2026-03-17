@@ -704,3 +704,36 @@ func (s *AppServer) handleReplyComment(ctx context.Context, args map[string]inte
 		}},
 	}
 }
+
+// handleFollowUser 处理关注/取消关注用户
+func (s *AppServer) handleFollowUser(ctx context.Context, args FollowUserArgs) *MCPToolResult {
+	if args.UserID == "" {
+		return &MCPToolResult{Content: []MCPContent{{Type: "text", Text: "操作失败: 缺少user_id参数"}}, IsError: true}
+	}
+	if args.XsecToken == "" {
+		return &MCPToolResult{Content: []MCPContent{{Type: "text", Text: "操作失败: 缺少xsec_token参数"}}, IsError: true}
+	}
+
+	var res *FollowUserResult
+	var err error
+
+	if args.Unfollow {
+		res, err = s.xiaohongshuService.UnfollowUser(ctx, args.UserID, args.XsecToken)
+	} else {
+		res, err = s.xiaohongshuService.FollowUser(ctx, args.UserID, args.XsecToken)
+	}
+
+	if err != nil {
+		action := "关注"
+		if args.Unfollow {
+			action = "取消关注"
+		}
+		return &MCPToolResult{Content: []MCPContent{{Type: "text", Text: action + "失败: " + err.Error()}}, IsError: true}
+	}
+
+	action := "关注"
+	if args.Unfollow {
+		action = "取消关注"
+	}
+	return &MCPToolResult{Content: []MCPContent{{Type: "text", Text: fmt.Sprintf("%s成功 - User ID: %s, %s", action, res.UserID, res.Message)}}}
+}

@@ -293,3 +293,31 @@ func (s *AppServer) myProfileHandler(c *gin.Context) {
 	c.Set("account", "ai-report")
 	respondSuccess(c, map[string]any{"data": result}, "获取我的主页成功")
 }
+
+// followUserHandler 关注/取消关注用户
+func (s *AppServer) followUserHandler(c *gin.Context) {
+	var req FollowUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		respondError(c, http.StatusBadRequest, "INVALID_REQUEST",
+			"请求参数错误", err.Error())
+		return
+	}
+
+	var result *FollowUserResult
+	var err error
+
+	if req.Unfollow {
+		result, err = s.xiaohongshuService.UnfollowUser(c.Request.Context(), req.UserID, req.XsecToken)
+	} else {
+		result, err = s.xiaohongshuService.FollowUser(c.Request.Context(), req.UserID, req.XsecToken)
+	}
+
+	if err != nil {
+		respondError(c, http.StatusInternalServerError, "FOLLOW_USER_FAILED",
+			"关注操作失败", err.Error())
+		return
+	}
+
+	c.Set("account", "ai-report")
+	respondSuccess(c, result, result.Message)
+}
